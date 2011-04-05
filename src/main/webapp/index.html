@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+</head>
+<body onload="initialize()">
+  <div id="map_canvas" style="width:100%; height:100%"></div>
+  <script src="/js/jquery-1.5.1.min.js"></script>
+  <script type="text/javascript">
+  function initialize() {
+
+  var map = null;
+  var ws = null;
+  var markers = [];
+  var info = null;
+  function logging(msg) {
+    console.log(msg); 
+  }
+  
+  function add(info, marker) {
+  	if (markers.length>300) {
+  		markers.shift().setMap(null);
+  	}
+  	if (info!=undefined) {
+  	  info.close();
+  	}
+  	/*
+  	info.setMap(null);
+  	info.setPosition(marker.position)
+  	info.open(map);
+  	*/
+  	markers.push(marker);
+  }
+  
+    var latlng = new google.maps.LatLng(37.439974,135);
+    var myOptions = {
+      zoom: 2,
+      center: latlng,
+      navigationControl: true,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+    
+    ws = new WebSocket("ws://"+location.host+"/tw/");
+    ws.onopen = function(e){ logging('open!'); };
+    ws.onclose = function(e){ logging('close!'); };
+    ws.onerror = function(e){ logging(e); };
+    ws.onmessage = function(e){
+      logging(e.data)
+    	var geo = $.parseJSON(e.data);
+    	var pos = new google.maps.LatLng(geo.lat, geo.lon);
+    	var marker = new google.maps.Marker({
+    		position: pos,
+    		map: map,
+    		title: geo.status,
+    		icon: new google.maps.MarkerImage(
+    		  geo.image_url,
+    		  new google.maps.Size(48,48), // size
+    		  new google.maps.Point(0,0), // origin
+    		  new google.maps.Point(24,24), //anchor
+    		  new google.maps.Size(24,24) // scaledSize
+    		),
+    		zIndex: 100
+    	});
+    	var info = new google.maps.InfoWindow({
+    		content: geo.status
+    	});
+    	add(info, marker);
+    }
+  }
+  </script>
+  </body>
+</html>
