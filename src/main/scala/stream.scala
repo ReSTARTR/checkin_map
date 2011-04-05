@@ -37,17 +37,17 @@ class MyListener extends StatusAdapter {
 }
 
 class Stream(conf: TwConfig, filter: String) {
-	val builder = new ConfigurationBuilder
-	builder.setOAuthConsumerKey( conf.CONSUMER_KEY )
-	builder.setOAuthConsumerSecret( conf.CONSUMER_SECRET )
-	builder.setOAuthAccessToken( conf.ACCESS_TOKEN )
-	builder.setOAuthAccessTokenSecret( conf.ACCESS_TOKEN_SECRET )
-	builder.setUserStreamBaseURL( conf.BASE_URL )
-	val buildOption = builder.build
+  val builder = new ConfigurationBuilder
+  builder.setOAuthConsumerKey( conf.CONSUMER_KEY )
+  builder.setOAuthConsumerSecret( conf.CONSUMER_SECRET )
+  builder.setOAuthAccessToken( conf.ACCESS_TOKEN )
+  builder.setOAuthAccessTokenSecret( conf.ACCESS_TOKEN_SECRET )
+  builder.setUserStreamBaseURL( conf.BASE_URL )
+  val buildOption = builder.build
   val stream = new TwitterStreamFactory(buildOption).getInstance
-	
-	def loopWithWhile(listener: StatusAdapter) {
-	  Logger ! "Stream::start"
+  
+  def loopWithWhile(listener: StatusAdapter) {
+    Logger ! "Stream::start"
     stream.addListener(listener)
     val q = new twitter4j.FilterQuery
     q.track(Array(filter))
@@ -63,21 +63,21 @@ class Stream(conf: TwConfig, filter: String) {
         }
       }
     }
-	}
-	
-	def loopWithFilter(listener: StatusAdapter) {
-	  Logger ! "Stream::start"
+  }
+  
+  def loopWithFilter(listener: StatusAdapter) {
+    Logger ! "Stream::start"
     stream.addListener(listener)
     val q = new twitter4j.FilterQuery
     q.track(Array(filter))
     stream.filter(q)
-	}
-	
-	def start(listener: StatusAdapter) {
-	  loopWithFilter(listener);
-	  //loopWithWhile(listener);
-	}
-	
-	def stop = stream.shutdown() 
+  }
+  
+  def start(listener: StatusAdapter) {
+    loopWithFilter(listener);
+    //loopWithWhile(listener);
+  }
+  
+  def stop = stream.shutdown() 
 }
 
